@@ -77,7 +77,10 @@ router.post(
 
 router.delete("/", auth, async (req, res) => {
   try {
-    await Users.findOneAndRemove({ _id: req.user.id });
+    const userToDelete = await Users.findOneAndRemove({ _id: req.user.id });
+    if (!userToDelete) {
+      return res.status(400).json({ errors: [{ msg: "User doesn't exist" }] });
+    }
     res.json({ msg: "User deleted" });
   } catch (err) {
     console.error(err.message);
