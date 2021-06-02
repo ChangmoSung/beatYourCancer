@@ -1,0 +1,16 @@
+nav {
+  padding: 3rem;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.8rem;
+
+    a {
+      text-decoration: none;
+    }
+  }
+}

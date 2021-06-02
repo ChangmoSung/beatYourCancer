@@ -20,6 +20,9 @@ module.exports = Users = mongoose.model(
       type: String,
       required: true,
     },
+    foodsList: {
+      type: Array,
+    },
     date: {
       type: Date,
       default: Date.now,

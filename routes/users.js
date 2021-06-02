@@ -88,4 +88,99 @@ router.delete("/", auth, async (req, res) => {
   }
 });
 
+// @route GET /users/getFoodsList
+// @desc Get foods list
+// @access Private
+router.get("/getFoodsList", auth, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const user = await Users.findOne({ _id: req.user.id });
+    if (!user) {
+      return res.status(400).json({ errors: [{ msg: "No matching user" }] });
+    }
+    res.send(user.foodsList);
+  } catch ({ message = "" }) {
+    console.error(message);
+    res.status(500).send(`Server error - ${message}`);
+  }
+});
+
+// @route PUT /users/addFood
+// @desc Add food
+// @access Private
+router.put(
+  "/addFood",
+  [auth, check("foodName", "Provide the name of the food").not().isEmpty()],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { _id, foodName } = req.body;
+
+    try {
+      const user = await Users.findOne({ _id: req.user.id });
+      if (!user) {
+        return res.status(400).json({ errors: [{ msg: "No matching user" }] });
+      }
+
+      const foodAlreadyOnTheList = user.foodsList.some(
+        ({ foodName: foodOnTheList }) => foodOnTheList === foodName
+      );
+      if (foodAlreadyOnTheList) {
+        return res.status(400).json({
+          errors: [{ msg: "You already have this food on your list" }],
+        });
+      }
+
+      user.foodsList.push({
+        _id,
+        foodName,
+      });
+
+      await user.save();
+      res.send(user.foodsList);
+    } catch ({ message = "" }) {
+      console.error(message);
+      res.status(500).send(`Server error - ${message}`);
+    }
+  }
+);
+
+// @route DELETE /users/deleteFood/:foodName
+// @desc Delete food
+// @access Private
+router.delete("/deleteFood/:foodId", auth, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) res.status(400).json({ errors: errors.array() });
+
+  try {
+    const user = await Users.findOne({ _id: req.user.id });
+    if (!user) res.status(400).json({ errors: [{ msg: "No matching user" }] });
+
+    const foodId = req.params.foodId;
+    const foodAlreadyOnTheList = user.foodsList.some(
+      ({ _id }) => _id === foodId
+    );
+    if (!foodAlreadyOnTheList) {
+      return res.status(400).json({
+        errors: [{ msg: "You don't have this food on your list" }],
+      });
+    }
+
+    const removeIndex = user.foodsList.map(({ _id }) => _id).indexOf(foodId);
+    user.foodsList.splice(removeIndex, 1);
+
+    await user.save();
+    res.send(user.foodsList);
+  } catch ({ message = "" }) {
+    console.error(message);
+    res.status(500).send(`Server error - ${message}`);
+  }
+});
+
 module.exports = router;
