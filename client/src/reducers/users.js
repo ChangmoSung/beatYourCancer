@@ -5,10 +5,17 @@ import {
   ADD_FOOD_ERROR,
   DELETE_FOOD,
   DELETE_FOOD_ERROR,
+  SIDE_EFFECTS_LOADED,
+  SIDE_EFFECTS_LOADED_ERROR,
+  ADD_SIDE_EFFECT_BY_USER,
+  ADD_SIDE_EFFECT_BY_USER_ERROR,
+  DELETE_SIDE_EFFECT_BY_USER,
+  DELETE_SIDE_EFFECT_BY_USER_ERROR,
 } from "../actions/types";
 
 const initialState = {
   foodsList: [],
+  sideEffectsList: [],
   loading: true,
   error: {},
 };
@@ -25,9 +32,20 @@ export default function (state = initialState, action) {
         foodsList: payload,
         loading: false,
       };
+    case SIDE_EFFECTS_LOADED:
+    case ADD_SIDE_EFFECT_BY_USER:
+    case DELETE_SIDE_EFFECT_BY_USER:
+      return {
+        ...state,
+        sideEffectsList: payload,
+        loading: false,
+      };
     case FOODS_LOADED_ERROR:
     case ADD_FOOD_ERROR:
     case DELETE_FOOD_ERROR:
+    case SIDE_EFFECTS_LOADED_ERROR:
+    case ADD_SIDE_EFFECT_BY_USER_ERROR:
+    case DELETE_SIDE_EFFECT_BY_USER_ERROR:
       return {
         ...state,
         error: payload,

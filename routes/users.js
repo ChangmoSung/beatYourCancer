@@ -151,7 +151,7 @@ router.put(
   }
 );
 
-// @route DELETE /users/deleteFood/:foodName
+// @route DELETE /users/deleteFood/:foodId
 // @desc Delete food
 // @access Private
 router.delete("/deleteFood/:foodId", auth, async (req, res) => {
@@ -182,5 +182,113 @@ router.delete("/deleteFood/:foodId", auth, async (req, res) => {
     res.status(500).send(`Server error - ${message}`);
   }
 });
+
+// @route GET /users/getSideEffectsList
+// @desc Get side effects list
+// @access Private
+router.get("/getSideEffectsList", auth, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const user = await Users.findOne({ _id: req.user.id });
+    if (!user) {
+      return res.status(400).json({ errors: [{ msg: "No matching user" }] });
+    }
+    res.send(user.sideEffectsList);
+  } catch ({ message = "" }) {
+    console.error(message);
+    res.status(500).send(`Server error - ${message}`);
+  }
+});
+
+// @route PUT /users/addSideEffectByUser
+// @desc Add side effect
+// @access Private
+router.put(
+  "/addSideEffectByUser",
+  [
+    auth,
+    check("sideEffect", "Provide the side effect you're experiencing")
+      .not()
+      .isEmpty(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { _id, sideEffect } = req.body;
+
+    try {
+      const user = await Users.findOne({ _id: req.user.id });
+      if (!user) {
+        return res.status(400).json({ errors: [{ msg: "No matching user" }] });
+      }
+
+      const sideEffectAlreadyOnTheList = user.sideEffectsList.some(
+        ({ sideEffect: sideEffectOnTheList }) =>
+          sideEffectOnTheList === sideEffect
+      );
+      if (sideEffectAlreadyOnTheList) {
+        return res.status(400).json({
+          errors: [{ msg: "You already have this side effect on your list" }],
+        });
+      }
+
+      user.sideEffectsList.push({
+        _id,
+        sideEffect,
+      });
+
+      await user.save();
+      res.send(user.sideEffectsList);
+    } catch ({ message = "" }) {
+      console.error(message);
+      res.status(500).send(`Server error - ${message}`);
+    }
+  }
+);
+
+// @route DELETE /users/deleteSideEffectByUser/:sideEffectId
+// @desc Delete side effect
+// @access Private
+router.delete(
+  "/deleteSideEffectByUser/:sideEffectId",
+  auth,
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) res.status(400).json({ errors: errors.array() });
+
+    try {
+      const user = await Users.findOne({ _id: req.user.id });
+      if (!user)
+        res.status(400).json({ errors: [{ msg: "No matching user" }] });
+
+      const sideEffectId = req.params.sideEffectId;
+      const sideEffectAlreadyOnTheList = user.sideEffectsList.some(
+        ({ _id }) => _id === sideEffectId
+      );
+      if (!sideEffectAlreadyOnTheList) {
+        return res.status(400).json({
+          errors: [{ msg: "You don't have this side effect on your list" }],
+        });
+      }
+
+      const removeIndex = user.sideEffectsList
+        .map(({ _id }) => _id)
+        .indexOf(sideEffectId);
+      user.sideEffectsList.splice(removeIndex, 1);
+
+      await user.save();
+      res.send(user.sideEffectsList);
+    } catch ({ message = "" }) {
+      console.error(message);
+      res.status(500).send(`Server error - ${message}`);
+    }
+  }
+);
 
 module.exports = router;

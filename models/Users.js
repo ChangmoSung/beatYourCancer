@@ -23,6 +23,9 @@ module.exports = Users = mongoose.model(
     foodsList: {
       type: Array,
     },
+    sideEffectsList: {
+      type: Array,
+    },
     date: {
       type: Date,
       default: Date.now,
