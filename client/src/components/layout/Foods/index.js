@@ -50,7 +50,7 @@ const Foods = ({
             <div className="buttonsContainer">
               <button
                 onClick={() =>
-                  window.confirm(`Would you like to delete ${foodName}?`) &&
+                  window.confirm(`Would you like to delete "${foodName}"?`) &&
                   deleteFood(_id)
                 }
               >

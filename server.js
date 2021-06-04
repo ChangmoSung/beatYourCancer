@@ -8,8 +8,9 @@ connectDB();
 
 app.use(express.json({ extended: false }));
 
-app.use("/users", require("./routes/users"));
 app.use("/auth", require("./routes/auth"));
+app.use("/users", require("./routes/users"));
+app.use("/sideEffects", require("./routes/sideEffects"));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));

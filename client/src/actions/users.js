@@ -1,19 +1,37 @@
 import axios from "axios";
 import { setAlert } from "./alerts";
 import {
+  ROLES_LOADED,
+  ROLES_LOADED_ERROR,
   FOODS_LOADED,
   FOODS_LOADED_ERROR,
   ADD_FOOD,
   ADD_FOOD_ERROR,
   DELETE_FOOD,
   DELETE_FOOD_ERROR,
-  SIDE_EFFECTS_LOADED,
-  SIDE_EFFECTS_LOADED_ERROR,
+  SIDE_EFFECTS_BY_USER_LOADED,
+  SIDE_EFFECTS_BY_USER_LOADED_ERROR,
   ADD_SIDE_EFFECT_BY_USER,
   ADD_SIDE_EFFECT_BY_USER_ERROR,
   DELETE_SIDE_EFFECT_BY_USER,
   DELETE_SIDE_EFFECT_BY_USER_ERROR,
 } from "./types.js";
+
+export const getRoles = () => async (dispatch) => {
+  try {
+    const res = await axios.get("/users/getRoles");
+
+    dispatch({
+      type: ROLES_LOADED,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: ROLES_LOADED_ERROR,
+      payload: { msg: err.response.statusText, status: err.response.status },
+    });
+  }
+};
 
 export const getFoodsList = () => async (dispatch) => {
   try {
@@ -74,17 +92,17 @@ export const deleteFood = (foodId = "") => async (dispatch) => {
   }
 };
 
-export const getSideEffectsList = () => async (dispatch) => {
+export const getSideEffectsListByUser = () => async (dispatch) => {
   try {
-    const res = await axios.get("/users/getSideEffectsList");
+    const res = await axios.get("/users/getSideEffectsListByUser");
 
     dispatch({
-      type: SIDE_EFFECTS_LOADED,
+      type: SIDE_EFFECTS_BY_USER_LOADED,
       payload: res.data,
     });
   } catch (err) {
     dispatch({
-      type: SIDE_EFFECTS_LOADED_ERROR,
+      type: SIDE_EFFECTS_BY_USER_LOADED_ERROR,
       payload: { msg: err.response.statusText, status: err.response.status },
     });
   }

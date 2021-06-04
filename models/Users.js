@@ -20,10 +20,13 @@ module.exports = Users = mongoose.model(
       type: String,
       required: true,
     },
+    roles: {
+      type: Array,
+    },
     foodsList: {
       type: Array,
     },
-    sideEffectsList: {
+    sideEffectsListByUser: {
       type: Array,
     },
     date: {

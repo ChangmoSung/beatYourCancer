@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -85,6 +84,26 @@ router.delete("/", auth, async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
+  }
+});
+
+// @route GET /users/getRoles
+// @desc Get roles
+// @access Private
+router.get("/getRoles", auth, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const user = await Users.findOne({ _id: req.user.id });
+    if (!user) {
+      return res.status(400).json({ errors: [{ msg: "No matching user" }] });
+    }
+    res.send(user.roles);
+  } catch ({ message = "" }) {
+    console.error(message);
+    res.status(500).send(`Server error - ${message}`);
   }
 });
 
@@ -183,10 +202,10 @@ router.delete("/deleteFood/:foodId", auth, async (req, res) => {
   }
 });
 
-// @route GET /users/getSideEffectsList
+// @route GET /users/getSideEffectsListByUser
 // @desc Get side effects list
 // @access Private
-router.get("/getSideEffectsList", auth, async (req, res) => {
+router.get("/getSideEffectsListByUser", auth, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -196,7 +215,7 @@ router.get("/getSideEffectsList", auth, async (req, res) => {
     if (!user) {
       return res.status(400).json({ errors: [{ msg: "No matching user" }] });
     }
-    res.send(user.sideEffectsList);
+    res.send(user.sideEffectsListByUser);
   } catch ({ message = "" }) {
     console.error(message);
     res.status(500).send(`Server error - ${message}`);
@@ -210,7 +229,7 @@ router.put(
   "/addSideEffectByUser",
   [
     auth,
-    check("sideEffect", "Provide the side effect you're experiencing")
+    check("sideEffectByUser", "Provide the side effect you're experiencing")
       .not()
       .isEmpty(),
   ],
@@ -220,7 +239,7 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { _id, sideEffect } = req.body;
+    const { _id, sideEffectByUser } = req.body;
 
     try {
       const user = await Users.findOne({ _id: req.user.id });
@@ -228,9 +247,9 @@ router.put(
         return res.status(400).json({ errors: [{ msg: "No matching user" }] });
       }
 
-      const sideEffectAlreadyOnTheList = user.sideEffectsList.some(
-        ({ sideEffect: sideEffectOnTheList }) =>
-          sideEffectOnTheList === sideEffect
+      const sideEffectAlreadyOnTheList = user.sideEffectsListByUser.some(
+        ({ sideEffectByUser: sideEffectOnTheList }) =>
+          sideEffectOnTheList === sideEffectByUser
       );
       if (sideEffectAlreadyOnTheList) {
         return res.status(400).json({
@@ -238,13 +257,13 @@ router.put(
         });
       }
 
-      user.sideEffectsList.push({
+      user.sideEffectsListByUser.push({
         _id,
-        sideEffect,
+        sideEffectByUser,
       });
 
       await user.save();
-      res.send(user.sideEffectsList);
+      res.send(user.sideEffectsListByUser);
     } catch ({ message = "" }) {
       console.error(message);
       res.status(500).send(`Server error - ${message}`);
@@ -268,7 +287,7 @@ router.delete(
         res.status(400).json({ errors: [{ msg: "No matching user" }] });
 
       const sideEffectId = req.params.sideEffectId;
-      const sideEffectAlreadyOnTheList = user.sideEffectsList.some(
+      const sideEffectAlreadyOnTheList = user.sideEffectsListByUser.some(
         ({ _id }) => _id === sideEffectId
       );
       if (!sideEffectAlreadyOnTheList) {
@@ -277,13 +296,13 @@ router.delete(
         });
       }
 
-      const removeIndex = user.sideEffectsList
+      const removeIndex = user.sideEffectsListByUser
         .map(({ _id }) => _id)
         .indexOf(sideEffectId);
-      user.sideEffectsList.splice(removeIndex, 1);
+      user.sideEffectsListByUser.splice(removeIndex, 1);
 
       await user.save();
-      res.send(user.sideEffectsList);
+      res.send(user.sideEffectsListByUser);
     } catch ({ message = "" }) {
       console.error(message);
       res.status(500).send(`Server error - ${message}`);

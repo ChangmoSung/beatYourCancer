@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./components/styles/styles.scss";
 import PrivateRoute from "./components/routing/PrivateRoute/index.js";
 import NavBar from "./components/layout/NavBar/index.js";
+import MainPage from "./components/layout/MainPage/index.js";
 import SignInPage from "./components/layout/SignInPage/index.js";
 import SignUpPage from "./components/layout/SignUpPage/index.js";
 import Foods from "./components/layout/Foods/index.js";
@@ -24,6 +25,7 @@ const App = () => {
           <Route exact path="/" component={SignInPage} />
           <Switch>
             <Route exact path="/signUpPage" component={SignUpPage} />
+            <PrivateRoute exact path="/mainPage" component={MainPage} />
             <PrivateRoute exact path="/foods" component={Foods} />
             <PrivateRoute exact path="/sideEffects" component={SideEffects} />
           </Switch>

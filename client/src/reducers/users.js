@@ -1,12 +1,14 @@
 import {
+  ROLES_LOADED,
+  ROLES_LOADED_ERROR,
   FOODS_LOADED,
   FOODS_LOADED_ERROR,
   ADD_FOOD,
   ADD_FOOD_ERROR,
   DELETE_FOOD,
   DELETE_FOOD_ERROR,
-  SIDE_EFFECTS_LOADED,
-  SIDE_EFFECTS_LOADED_ERROR,
+  SIDE_EFFECTS_BY_USER_LOADED,
+  SIDE_EFFECTS_BY_USER_LOADED_ERROR,
   ADD_SIDE_EFFECT_BY_USER,
   ADD_SIDE_EFFECT_BY_USER_ERROR,
   DELETE_SIDE_EFFECT_BY_USER,
@@ -14,8 +16,9 @@ import {
 } from "../actions/types";
 
 const initialState = {
+  roles: [],
   foodsList: [],
-  sideEffectsList: [],
+  sideEffectsListByUser: [],
   loading: true,
   error: {},
 };
@@ -24,6 +27,12 @@ export default function (state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
+    case ROLES_LOADED:
+      return {
+        ...state,
+        roles: payload,
+        loading: false,
+      };
     case FOODS_LOADED:
     case ADD_FOOD:
     case DELETE_FOOD:
@@ -32,18 +41,19 @@ export default function (state = initialState, action) {
         foodsList: payload,
         loading: false,
       };
-    case SIDE_EFFECTS_LOADED:
+    case SIDE_EFFECTS_BY_USER_LOADED:
     case ADD_SIDE_EFFECT_BY_USER:
     case DELETE_SIDE_EFFECT_BY_USER:
       return {
         ...state,
-        sideEffectsList: payload,
+        sideEffectsListByUser: payload,
         loading: false,
       };
+    case ROLES_LOADED_ERROR:
     case FOODS_LOADED_ERROR:
     case ADD_FOOD_ERROR:
     case DELETE_FOOD_ERROR:
-    case SIDE_EFFECTS_LOADED_ERROR:
+    case SIDE_EFFECTS_BY_USER_LOADED_ERROR:
     case ADD_SIDE_EFFECT_BY_USER_ERROR:
     case DELETE_SIDE_EFFECT_BY_USER_ERROR:
       return {
