@@ -72,6 +72,7 @@ const SideEffects = ({
               aria-label="Side effect"
               required
             />
+            <button>Add</button>
           </form>
         )}
         {sideEffectsListByAdmin.length > 0 &&
@@ -104,6 +105,7 @@ const SideEffects = ({
             aria-label="Side effect"
             required
           />
+          <button>Add</button>
         </form>
         {sideEffectsListByUser.length > 0 &&
           sideEffectsListByUser.map(({ _id, sideEffectByUser }, i) => (

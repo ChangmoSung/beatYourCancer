@@ -42,6 +42,7 @@ const Foods = ({
           aria-label="Food name"
           required
         />
+        <button>Add</button>
       </form>
       {foodsList.length > 0 &&
         foodsList.map(({ _id, foodName }, i) => (
