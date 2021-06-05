@@ -22,7 +22,7 @@ const App = () => {
     <Provider store={store}>
       <Router>
         <PrivateRoute component={NavBar} />
-        <div className="container">
+        <div className="wrapper">
           <Alerts />
           <Route exact path="/" component={SignInPage} />
           <Switch>

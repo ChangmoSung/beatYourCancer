@@ -14,6 +14,7 @@ import {
   addSideEffectByAdmin,
   deleteSideEffectByAdmin,
 } from "../../../actions/sideEffects";
+import eraser from "../../../images/eraser.png";
 
 const SideEffects = ({
   roles,
@@ -35,11 +36,16 @@ const SideEffects = ({
   });
   const { sideEffectByAdmin } = formDataByAdmin;
 
+  const [page, setPage] = useState("admin");
+
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
   const onSubmit = (e) => {
     e.preventDefault();
-    addSideEffectByUser({ _id: uuidv4(), sideEffectByUser });
+    addSideEffectByUser({
+      _id: `${sideEffectByUser}-${uuidv4()}`,
+      sideEffectByUser,
+    });
   };
 
   const onChangeByAdmin = (e) =>
@@ -59,73 +65,88 @@ const SideEffects = ({
   if (!isAuthenticated) return <Redirect to="/" />;
 
   return (
-    <Fragment>
+    <div className="sideEffectsContainer">
       <h2>Side effects</h2>
-      <div className="sideEffectsByAdmin">
-        {admin && (
-          <form onSubmit={onSubmitByAdmin}>
+      {page === "admin" && (
+        <Fragment>
+          <button className="setPageButton" onClick={() => setPage("user")}>
+            Common side effects
+          </button>
+          {admin && (
+            <form onSubmit={onSubmitByAdmin}>
+              <input
+                type="text"
+                name="sideEffectByAdmin"
+                onChange={onChangeByAdmin}
+                placeholder="Side effect"
+                aria-label="Side effect"
+                required
+              />
+              <button>Add</button>
+            </form>
+          )}
+          <div className="sideEffects">
+            {sideEffectsListByAdmin.length > 0 &&
+              sideEffectsListByAdmin.map(({ _id, sideEffectByAdmin }, i) => (
+                <div key={i} className="sideEffect">
+                  <span>{sideEffectByAdmin}</span>
+                  {admin && (
+                    <div className="buttonsContainer">
+                      <button
+                        onClick={() =>
+                          window.confirm(
+                            `Would you like to delete "${sideEffectByAdmin}"?`
+                          ) && deleteSideEffectByAdmin(_id)
+                        }
+                      >
+                        <img src={eraser} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+          </div>
+        </Fragment>
+      )}
+
+      {page === "user" && (
+        <Fragment>
+          <button className="setPageButton" onClick={() => setPage("admin")}>
+            Experienced side effects
+          </button>
+          <form onSubmit={onSubmit}>
             <input
               type="text"
-              name="sideEffectByAdmin"
-              onChange={onChangeByAdmin}
+              name="sideEffectByUser"
+              onChange={onChange}
               placeholder="Side effect"
               aria-label="Side effect"
               required
             />
             <button>Add</button>
           </form>
-        )}
-        {sideEffectsListByAdmin.length > 0 &&
-          sideEffectsListByAdmin.map(({ _id, sideEffectByAdmin }, i) => (
-            <div key={i} className="individualSideEffectByAdmin">
-              <span>{sideEffectByAdmin}</span>
-              {admin && (
-                <div className="buttonsContainer">
-                  <button
-                    onClick={() =>
-                      window.confirm(
-                        `Would you like to delete "${sideEffectByAdmin}"?`
-                      ) && deleteSideEffectByAdmin(_id)
-                    }
-                  >
-                    X
-                  </button>
+          <div className="sideEffects">
+            {sideEffectsListByUser.length > 0 &&
+              sideEffectsListByUser.map(({ _id, sideEffectByUser }, i) => (
+                <div key={i} className="sideEffect">
+                  <span>{sideEffectByUser}</span>
+                  <div className="buttonsContainer">
+                    <button
+                      onClick={() =>
+                        window.confirm(
+                          `Would you like to delete "${sideEffectByUser}"?`
+                        ) && deleteSideEffectByUser(_id)
+                      }
+                    >
+                      <img src={eraser} />
+                    </button>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
-      </div>
-      <div className="sideEffectsByUser">
-        <form onSubmit={onSubmit}>
-          <input
-            type="text"
-            name="sideEffectByUser"
-            onChange={onChange}
-            placeholder="Side effect"
-            aria-label="Side effect"
-            required
-          />
-          <button>Add</button>
-        </form>
-        {sideEffectsListByUser.length > 0 &&
-          sideEffectsListByUser.map(({ _id, sideEffectByUser }, i) => (
-            <div key={i} className="individualSideEffectByUser">
-              <span>{sideEffectByUser}</span>
-              <div className="buttonsContainer">
-                <button
-                  onClick={() =>
-                    window.confirm(
-                      `Would you like to delete "${sideEffectByUser}"?`
-                    ) && deleteSideEffectByUser(_id)
-                  }
-                >
-                  X
-                </button>
-              </div>
-            </div>
-          ))}
-      </div>
-    </Fragment>
+              ))}
+          </div>
+        </Fragment>
+      )}
+    </div>
   );
 };
 
